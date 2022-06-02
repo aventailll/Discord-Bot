@@ -6,19 +6,21 @@ def get_rank(username):
     watcher = LolWatcher(api_key)
     region = 'na1'
 
-    user_data = watcher.summoner.by_name(region, username)
+    user_lower = username.lower()
+    user_data = watcher.summoner.by_name(region, user_lower)
 
     ranked_stats = watcher.league.by_summoner(region, user_data['id'])
 
     for i in range(len(ranked_stats)):
         gamemode = ranked_stats[i]['queueType']
-        if gamemode == 'RANKED_SOLO_5x5':
-            queue = 'Queue Type: Ranked Solo/Duo'
-        elif gamemode == 'RANKED_FLEX_SR':
-            queue = 'Queue Type: Ranked Flex'
-        tier = ranked_stats[i]['tier']
-        rank = ranked_stats[i]['rank']
-        tier_rank = 'Rank: ' + tier + ' ' + rank
+        if gamemode != 'RANKED_TFT_PAIRS':
+            if gamemode == 'RANKED_SOLO_5x5':
+                queue = 'Ranked Solo/Duo: '
+            else:
+                break
+            tier = ranked_stats[i]['tier']
+            rank = ranked_stats[i]['rank']
+            tier_rank = queue + tier + ' ' + rank
 
     puuid = user_data.get('puuid')
     my_matches = watcher.match.matchlist_by_puuid(region, puuid)
@@ -32,7 +34,8 @@ def get_rank(username):
         match_detail = matches[i]
         target = ''
         for key in match_detail['info']['participants']:
-            if key['summonerName'] == username:
+            key_lower = key['summonerName'].lower()
+            if key_lower == user_lower:
                 target = key
                 if key['win'] == False:
                     win_lost.append('🟥')
@@ -40,4 +43,6 @@ def get_rank(username):
                     win_lost.append('🟩')
                 break
     win_streak = ''.join(win_lost)
-    return username, queue, tier_rank, 'Recent 10 Games:', win_streak
+    return username, tier_rank, 'Recent 10 Games:', win_streak
+
+print(get_rank('halal meat'))

@@ -11,9 +11,10 @@ async def on_ready(): #is called when the bot is ready to start being used
 async def on_message(message): #event triggers each time a message is received
     if message.author == client.user:
         return
-    if message.content.startswith('$league GigaBlue'):
-        rank_stats = get_rank('GigaBlue')
+    if message.content.startswith('$league'):
+        username = message.content[8:]
+        rank_stats = get_rank(username)
         for i in range(len(rank_stats)):
             await message.channel.send(rank_stats[i])
-
+    
 client.run('OTgwNjc5MjcyOTUzOTU0MzU1.Gwmkje.tpGgNF5NzPlDZNGlAFXOie317d9Hyhf5DC0tHo')
