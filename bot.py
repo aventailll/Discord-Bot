@@ -1,6 +1,11 @@
 import discord
 from ranked_finder import get_rank
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client() #gets connect to Discord
 
 @client.event #is used to register an event
@@ -14,7 +19,6 @@ async def on_message(message): #event triggers each time a message is received
     if message.content.startswith('$league'):
         username = message.content[8:]
         rank_stats = get_rank(username)
-        for i in range(len(rank_stats)):
-            await message.channel.send(rank_stats[i])
+        await message.channel.send(rank_stats)
     
-client.run('OTgwNjc5MjcyOTUzOTU0MzU1.Gwmkje.tpGgNF5NzPlDZNGlAFXOie317d9Hyhf5DC0tHo')
+client.run(TOKEN)
