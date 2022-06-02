@@ -1,35 +1,47 @@
+#using riotwatcher library to read Riot API
 from riotwatcher import LolWatcher, ApiError
 from soupsieve import match
 
+#this function receives a riot username (not case-sensitize) and outputs the ranked solo/duo rank and last 10 wins/lost
 def get_rank(username):
-    api_key = 'RGAPI-1e891e9b-310f-4c7a-a3b8-7386a0c39847'
-    watcher = LolWatcher(api_key)
-    region = 'na1'
+    api_key = 'RGAPI-dfe3815a-f3e5-46ad-993b-9638b6c35799' #api developer key given by Riot
+    watcher = LolWatcher(api_key) #uses the API key to access data from Riot
+    region = 'na1' 
 
     user_lower = username.lower()
-    user_data = watcher.summoner.by_name(region, user_lower)
+    user_data = watcher.summoner.by_name(region, user_lower) #gets basic data about the user
 
-    ranked_stats = watcher.league.by_summoner(region, user_data['id'])
+    ranked_stats = watcher.league.by_summoner(region, user_data['id']) #gets the ranked stats of the user 
 
+    #gets the ranked solo/duo tier and rank of the user
+    tier_rank = []
     for i in range(len(ranked_stats)):
         gamemode = ranked_stats[i]['queueType']
-        if gamemode != 'RANKED_TFT_PAIRS':
-            if gamemode == 'RANKED_SOLO_5x5':
-                queue = 'Ranked Solo/Duo: '
-            else:
-                break
-            tier = ranked_stats[i]['tier']
-            rank = ranked_stats[i]['rank']
-            tier_rank = queue + tier + ' ' + rank
-
+        if gamemode == 'RANKED_SOLO_5x5':
+            queue = '**Ranked Solo/Duo:**'
+        elif gamemode == 'RANKED_FLEX_SR':
+            queue = '**Ranked Flex:**'
+        elif gamemode == 'RANKED_TFT_PAIRS':
+            break
+        tier = ranked_stats[i]['tier']
+        rank = ranked_stats[i]['rank']
+        tier_rank.append(queue + ' ' + tier + ' ' + rank)
+    
+    for i in range(len(tier_rank)):
+        ranks = ' '.join(tier_rank)
     puuid = user_data.get('puuid')
-    my_matches = watcher.match.matchlist_by_puuid(region, puuid)
+    my_matches = watcher.match.matchlist_by_puuid(region, puuid) #receives the last 20 match IDs of the user
+
     matches = []
+
+    #pre-loads the match information about each of the 10 matches and appends them into a list (we do this to decrease time)
     for i in range(10):
         last_match = my_matches[i]
         matches.append(watcher.match.by_id(region, last_match))
 
     win_lost = []
+
+    #uses the pre-loaded data about the matches and prints a red or green square based on of the user won or lost the game for the last 10 games
     for i in range(10):
         match_detail = matches[i]
         target = ''
@@ -43,6 +55,5 @@ def get_rank(username):
                     win_lost.append('🟩')
                 break
     win_streak = ''.join(win_lost)
-    return username, tier_rank, 'Recent 10 Games:', win_streak
-
-print(get_rank('halal meat'))
+    output = '**' + username + '** ' + ranks + ' ' + '**Recent 10 Games:** ' + win_streak 
+    return output
