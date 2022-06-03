@@ -1,5 +1,6 @@
 import discord
 from ranked_finder import get_rank
+from valorant_stats import val_stats
 import os
 from dotenv import load_dotenv
 
@@ -18,7 +19,10 @@ async def on_message(message): #event triggers each time a message is received
         return
     if message.content.startswith('$league'): #sees if the beginning of the message starts with '$league' to trigger the command
         username = message.content[8:] #concatenates the beginning of the message to only get the username
-        rank_stats = get_rank(username) #uses the get_rank function to get the data about the user
-        await message.channel.send(rank_stats) #prints the users data into discord
-    
+        league_stats = get_rank(username) #uses the get_rank function to get the data about the user
+        await message.channel.send(league_stats) #prints the users data into discord
+    if message.content.startswith('$val'):
+        username = message.content[5:]
+        valorant_stats = val_stats(username)
+        await message.channel.send(valorant_stats)
 client.run(TOKEN)
