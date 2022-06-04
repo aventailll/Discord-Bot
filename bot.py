@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv('OTA1NjU3Mzc0NzM4NjEyMjk2.YYNRKA.VNclXAHW2AMdqglQ8u5tuSgi4Ls')
+TOKEN = os.getenv('O4Ls')
 client = discord.Client() #gets connect to Discord
 
 @client.event #is used to register an event
